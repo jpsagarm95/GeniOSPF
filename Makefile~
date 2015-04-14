@@ -1,0 +1,10 @@
+all:	process
+
+process:	main.o	helloPacketsHandler.o
+	gcc -o process main.o helloPacketsHandler.o
+
+main.o:	main.c
+	gcc -g -c main.c -pthreads
+	
+helloPacketsHandler.o:	helloPacketsHandler.c
+	gcc -g -c helloPacketsHandler.c

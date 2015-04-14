@@ -1,0 +1,103 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+
+extern int HELLO_INTERVAL;
+extern int identifier;
+extern int HELLO_INTERVAL;
+extern int NUMBER_OF_ROUTERS;
+extern int NUMBER_OF_EDGES;
+extern int** linkDetails;
+extern int NUMBER_OF_NEIGHBORS;
+extern int* NEIGHBOR_IDS;
+extern int sock;
+extern struct sockaddr_in my_addr;
+extern struct hostent *host;
+extern int MAX_POSSIBLE_DIST;
+extern int** neighbor_link_details;
+extern int** actual_link_costs;
+extern int** practise_costs;
+
+
+void* sender(void* param){
+	int i = 0, peer_id;
+	host = (struct hostent *) gethostbyname("localhost");
+	struct sockaddr_in peer_addr;
+	peer_addr.sin_family = AF_INET;
+    peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
+    printf("%s\n", "In sender");
+    bzero(&(peer_addr.sin_zero), 8);
+    char send_data[1024];
+	while(1){
+		for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
+			peer_id = NEIGHBOR_IDS[i];
+			peer_addr.sin_port = htons(20000 + peer_id);
+			// printf("Hello sent to %d\n", peer_id);
+			strncpy(send_data, "HELLO", 5);
+			strncpy(send_data + 5, (char *)&identifier, 4);
+			// send_data[9] = '\0';
+			// printf("%s\n",pee);
+			sendto(sock, send_data, 9, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr));
+		}
+		sleep(HELLO_INTERVAL);
+		printf("%s\n", "Actual Link Costs:");
+		for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
+			printf("%d %d\n", actual_link_costs[i][0], actual_link_costs[i][1]);
+		}
+	}
+}
+
+void* receiver(void* param){
+	printf("%s\n", "I am in receiver");
+	struct sockaddr_in peer_addr;
+	int addr_len = sizeof (struct sockaddr);
+	char recv_data[1024];
+	char send_data[1024];
+	int bytes_read;
+	int peer_id, i, cost, max, min, dummy;
+	while(1){
+		bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &peer_addr, &addr_len);
+		recv_data[bytes_read] = '\0';
+
+		// printf("\n(%s , %d) said : ", inet_ntoa(client_addr.sin_addr),
+		//         ntohs(client_addr.sin_port));
+		// printf("%s", recv_data);
+		// fflush(stdout);
+		if(strncmp(recv_data, "HELLOREPLY", 10) == 0){
+			strncpy((char *)&peer_id, recv_data + 10, 4);
+			for(i = 0; i < NUMBER_OF_NEIGHBORS; i++){
+				if(actual_link_costs[i][0] == peer_id){
+					strncpy((char*)&dummy, recv_data + 18, 4);
+					actual_link_costs[i][1] = dummy;
+					printf("%d\n",dummy );
+					break;
+				}
+			}
+		}else if(strncmp(recv_data, "HELLO", 5) == 0){
+			strncpy((char *)&peer_id, recv_data + 5, 4);
+			for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
+				if(practise_costs[i][0] == peer_id){
+					cost = practise_costs[i][1];
+					break;
+				}
+			}
+			strncpy(send_data, "HELLOREPLY", 10);
+			strncpy(send_data + 10, (char *)&identifier, 4);
+			strncpy(send_data + 14, (char *)&peer_id, 4);
+			strncpy(send_data + 18, (char *)&cost, 4);
+			send_data[22] = '\0';
+			// printf("%d\n", cost);
+			sendto(sock, send_data, 22, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr));
+			// printf("\nTransaction done\n");
+		}
+	}
+
+}

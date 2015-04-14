@@ -1,0 +1,5 @@
+#include <stdio.h>
+
+void* spf(void* param);
+void dijkstras(int time, int** distMatrix);
+char *strrev(char *str);

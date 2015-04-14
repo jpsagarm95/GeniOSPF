@@ -1,0 +1,5 @@
+Rounting table at time 0
+Destination	Path	Cost
+1 0-1 10
+2 0-1-2 11
+
