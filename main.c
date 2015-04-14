@@ -20,7 +20,6 @@ int SPF_INTERVAL;
 int NUMBER_OF_ROUTERS;
 int NUMBER_OF_EDGES;
 int** linkDetails;
-int** neighbor_link_details;
 int NUMBER_OF_NEIGHBORS;
 int* NEIGHBOR_IDS;
 int sock;
@@ -50,7 +49,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-	host = (struct hostent *) gethostbyname("localhost");
+	// host = (struct hostent *) gethostbyname("localhost");
 
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
 		perror("socket");
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]){
 	}
 
 	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = htons(20000 + identifier);
+	my_addr.sin_port = htons(20039);
 	my_addr.sin_addr.s_addr = INADDR_ANY;
 	bzero(&(my_addr.sin_zero), 8);
 	if (bind(sock, (struct sockaddr *) &my_addr,
@@ -67,13 +66,13 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 	pthread_t hello_packet_sender;
-	pthread_t lsa_packet_send;
-    pthread_t rec;
-    pthread_t spf_t;
+	// pthread_t lsa_packet_send;
+    // pthread_t rec;
+    // pthread_t spf_t;
     pthread_create(&hello_packet_sender, NULL, &sender, NULL);
-    pthread_create(&lsa_packet_send, NULL, &lsa_packet_sender, NULL);
-    pthread_create(&rec, NULL, &receiver, NULL);
-    pthread_create(&spf_t, NULL, &spf, NULL);
+    // pthread_create(&lsa_packet_send, NULL, &lsa_packet_sender, NULL);
+    // pthread_create(&rec, NULL, &receiver, NULL);
+    // pthread_create(&spf_t, NULL, &spf, NULL);
 
     while(1);
 }
@@ -122,10 +121,10 @@ void initializer(int argc, char *argv[]){
 	linkDetails = (int**)malloc(sizeof(int *) * NUMBER_OF_EDGES);
 	int j;
 	for(i = 0 ; i < NUMBER_OF_EDGES ; i++){
-		linkDetails[i] = (int *)malloc(sizeof(int) * 4);
+		linkDetails[i] = (int *)malloc(sizeof(int) * 2);
 		fgets(buf, 1000, ifp);
 		data = strtok(buf, "\t\n ");
-		for(j = 0 ; j < 4 ; j++){
+		for(j = 0 ; j < 2 ; j++){
 			linkDetails[i][j] = atoi(data);
 			data = strtok(NULL, "\t\n, ");
 		}
@@ -139,11 +138,11 @@ void initializer(int argc, char *argv[]){
 	}
 	neighbor_link_details = (int**)malloc(sizeof(int*) * NUMBER_OF_NEIGHBORS);
 	actual_link_costs = (int**)malloc(sizeof(int*) * NUMBER_OF_NEIGHBORS);
-	practise_costs = (int**)malloc(sizeof(int*) * NUMBER_OF_NEIGHBORS);
+	// practise_costs = (int**)malloc(sizeof(int*) * NUMBER_OF_NEIGHBORS);
 	for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 		neighbor_link_details[i] = (int *)malloc(sizeof(int) * 3);
 		actual_link_costs[i] = (int *)malloc(sizeof(int)*2);
-		practise_costs[i] = (int *)malloc(sizeof(int)*2);
+		// practise_costs[i] = (int *)malloc(sizeof(int)*2);
 	}
 
 
@@ -163,45 +162,42 @@ void initializer(int argc, char *argv[]){
 		if(linkDetails[i][0] == identifier){
 			NEIGHBOR_IDS[counter] = linkDetails[i][1];
 			neighbor_link_details[counter][0] = linkDetails[i][1];
-			neighbor_link_details[counter][1] = linkDetails[i][2];
-			neighbor_link_details[counter][2] = linkDetails[i][3];
+			// neighbor_link_details[counter][1] = linkDetails[i][2];
+			// neighbor_link_details[counter][2] = linkDetails[i][3];
 			actual_link_costs[counter][0] = linkDetails[i][1];
 			actual_link_costs[counter][1] = 99999;
-			min = neighbor_link_details[counter][1];
-			max = neighbor_link_details[counter][2];
-			if(min == max){
-				cost = min;
-			}else{
-				cost = (rand()%(max - min + 1)) + min;
-			}
-			practise_costs[counter][0] = linkDetails[i][1];
-			practise_costs[counter][1] = cost;
+			// min = neighbor_link_details[counter][1];
+			// max = neighbor_link_details[counter][2];
+			// if(min == max){
+			// 	cost = min;
+			// }else{
+			// 	cost = (rand()%(max - min + 1)) + min;
+			// }
+			// practise_costs[counter][0] = linkDetails[i][1];
+			// practise_costs[counter][1] = cost;
 			counter++;
 		}else if(linkDetails[i][1] == identifier){
 			NEIGHBOR_IDS[counter] = linkDetails[i][0];
 			neighbor_link_details[counter][0] = linkDetails[i][0];
-			neighbor_link_details[counter][1] = linkDetails[i][2];
-			neighbor_link_details[counter][2] = linkDetails[i][3];
+			// neighbor_link_details[counter][1] = linkDetails[i][2];
+			// neighbor_link_details[counter][2] = linkDetails[i][3];
 			actual_link_costs[counter][0] = linkDetails[i][0];
 			actual_link_costs[counter][1] = 99999;
-			min = neighbor_link_details[counter][1];
-			max = neighbor_link_details[counter][2];
-			if(min == max){
-				cost = min;
-			}else{
-				cost = (rand()%(max - min + 1)) + min;
-			}
-			practise_costs[counter][0] = linkDetails[i][0];
-			practise_costs[counter][1] = cost;
+			// min = neighbor_link_details[counter][1];
+			// max = neighbor_link_details[counter][2];
+			// if(min == max){
+			// 	cost = min;
+			// }else{
+			// 	cost = (rand()%(max - min + 1)) + min;
+			// }
+			// practise_costs[counter][0] = linkDetails[i][0];
+			// practise_costs[counter][1] = cost;
 			counter++;
 		}
 
-		if(MAX_POSSIBLE_DIST < linkDetails[i][3]){
-			MAX_POSSIBLE_DIST = linkDetails[i][3];
-		}
 	}
 
-	MAX_POSSIBLE_DIST++;
+	MAX_POSSIBLE_DIST = 9999999;
 	// for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 	// 	printf("%d %d\n", practise_costs[i][0], practise_costs[i][1]);
 	// }
