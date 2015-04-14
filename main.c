@@ -20,6 +20,7 @@ int SPF_INTERVAL;
 int NUMBER_OF_ROUTERS;
 int NUMBER_OF_EDGES;
 int** linkDetails;
+int** neighbor_link_details;
 int NUMBER_OF_NEIGHBORS;
 int* NEIGHBOR_IDS;
 int sock;
