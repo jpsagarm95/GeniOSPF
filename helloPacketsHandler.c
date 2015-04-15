@@ -62,6 +62,7 @@ void* sender(void* param){
 		for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 			peer_id = NEIGHBOR_IDS[i];
 			addr[5] = exchange(peer_id);
+			printf("%s\n", addr);
 			host = (struct hostent *) gethostbyname(addr);
 			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
 			// printf("Hello sent to %d\n", peer_id);
@@ -73,6 +74,7 @@ void* sender(void* param){
 			struct timeval timenow;
 			gettimeofday(&timenow, NULL);
 			helloTime = ((timenow.tv_sec  % 1000000)* 1000000 + (timenow.tv_usec));
+			printf("%d\n", helloTime);
 		}
 		printf("%s\n", "Actual Link Costs:");
 		for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
