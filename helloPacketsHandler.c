@@ -19,7 +19,6 @@ extern int NUMBER_OF_NEIGHBORS;
 extern int* NEIGHBOR_IDS;
 extern int sock;
 extern struct sockaddr_in my_addr;
-extern struct hostent *host;
 extern int MAX_POSSIBLE_DIST;
 extern int** neighbor_link_details;
 extern int** actual_link_costs;
@@ -51,6 +50,7 @@ void* sender(void* param){
 	int i = 0, peer_id;
 	char addr[10] = "node-";
 	addr[6] = '\0';
+	struct hostent *host;
 	struct sockaddr_in peer_addr;
 	peer_addr.sin_family = AF_INET;
 	peer_addr.sin_port = htons(20039);
@@ -89,6 +89,7 @@ void* receiver(void* param){
 	char recv_data[1024];
 	char send_data[1024];
 	int bytes_read;
+	struct hostent *host;
 	int peer_id, i, cost, max, min, dummy, node_seq_num, node_id, num_of_entries, offset, j;
 	// printf("%s\n", "Lsa status:");
 	// for(i = 0 ; i < NUMBER_OF_ROUTERS; i++){
@@ -97,7 +98,7 @@ void* receiver(void* param){
 	while(1){
 		bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &peer_addr, &addr_len);
 		recv_data[bytes_read] = '\0';
-
+		printf("%s\n", "I received something atleast.");
 		// printf("\n(%s , %d) said : ", inet_ntoa(client_addr.sin_addr),
 		//         ntohs(client_addr.sin_port));
 		// printf("%s", recv_data);

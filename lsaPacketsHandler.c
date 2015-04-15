@@ -17,7 +17,6 @@ extern int NUMBER_OF_NEIGHBORS;
 extern int* NEIGHBOR_IDS;
 extern int sock;
 extern struct sockaddr_in my_addr;
-extern struct hostent *host;
 extern int MAX_POSSIBLE_DIST;
 extern int** neighbor_link_details;
 extern int** actual_link_costs;
@@ -31,6 +30,7 @@ extern pthread_mutex_t lock;
 void* lsa_packet_sender(void* param){
 	int i, offset, peer_id;
 	char send_data[1024];
+	struct hostent *host;
 	host = (struct hostent *) gethostbyname("localhost");
 	struct sockaddr_in peer_addr;
 	peer_addr.sin_family = AF_INET;

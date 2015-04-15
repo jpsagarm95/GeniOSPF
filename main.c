@@ -25,7 +25,6 @@ int NUMBER_OF_NEIGHBORS;
 int* NEIGHBOR_IDS;
 int sock;
 struct sockaddr_in my_addr;
-struct hostent *host;
 int MAX_POSSIBLE_DIST;
 int** actual_link_costs;
 int** practise_costs;
