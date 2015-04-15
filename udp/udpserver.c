@@ -4,7 +4,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <netdb.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
@@ -19,7 +18,6 @@ int main(int argc, char *argv[]) {
     int sock;
     int addr_len, bytes_read;
     char recv_data[1024];
-        struct hostent *host;
     struct sockaddr_in server_addr, client_addr;
     if (argc < 2) {
         printf("PortNo Missing");
@@ -44,24 +42,10 @@ int main(int argc, char *argv[]) {
 
     addr_len = sizeof (struct sockaddr);
 
-
-	host = (struct hostent *) gethostbyname("localhost");
-
-
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(8000);
-    client_addr.sin_addr = *((struct in_addr *) host->h_addr);
-    bzero(&(server_addr.sin_zero), 8);
-
-
-
-
     printf("\nUDPServer Waiting for client on port %s\n", argv[1]);
     fflush(stdout);
 
     while (1) {
-    	sendto(sock, "hello", strlen("hello"), 0,
-                (struct sockaddr *) &client_addr, sizeof (struct sockaddr));
         bytes_read = recvfrom(sock, recv_data, 1024, 0,
                 (struct sockaddr *) &client_addr, &addr_len);
 
