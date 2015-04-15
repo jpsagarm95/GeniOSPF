@@ -117,6 +117,7 @@ void* receiver(void* param){
 			}
 			pthread_mutex_unlock(&lock);
 		}else if(strncmp(recv_data, "HELLO", 5) == 0){
+			printf("%s\n", "I just received a hello packet.");
 			strncpy((char *)&peer_id, recv_data + 5, 4);
 			// for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
 			// 	if(practise_costs[i][0] == peer_id){
