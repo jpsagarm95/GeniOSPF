@@ -106,6 +106,9 @@ void* receiver(void* param){
 	while(1){
 		bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &peer_addr, &addr_len);
 		recv_data[bytes_read] = '\0';
+		// bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &client_addr, &addr_len);
+  //       recv_data[bytes_read] = '\0';
+
 		printf("%s\n", "I received something atleast.");
 		// printf("\n(%s , %d) said : ", inet_ntoa(client_addr.sin_addr),
 		//         ntohs(client_addr.sin_port));
