@@ -17,7 +17,7 @@ extern int NUMBER_OF_ROUTERS;
 extern int NUMBER_OF_EDGES;
 extern int NUMBER_OF_NEIGHBORS;
 extern int* NEIGHBOR_IDS;
-extern int sock;
+// extern int sock;
 extern struct sockaddr_in my_addr;
 extern struct hostent *host;
 extern int MAX_POSSIBLE_DIST;
@@ -46,9 +46,16 @@ const char* exchange(int i){
  }
 
 void* sender(void* param){
+	int sock;
 	int i = 0, peer_id;
 	struct sockaddr_in peer_addr;
     char send_data[1024];
+
+    if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("socket");
+        exit(1);
+    }
+
 	while(1){
 		sleep(HELLO_INTERVAL);
 		for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
@@ -75,12 +82,30 @@ void* sender(void* param){
 }
 
 void* receiver(void* param){
-	struct sockaddr_in peer_addr;
+	int sock;
+	struct sockaddr_in peer_addr, my_addr;
 	int addr_len = sizeof (struct sockaddr);
 	char recv_data[1024];
 	char send_data[1024];
 	int bytes_read;
 	int peer_id, i, cost, max, min, dummy, node_seq_num, node_id, num_of_entries, offset, j;
+
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("Socket");
+        exit(1);
+    }
+
+    my_addr.sin_family = AF_INET;
+    my_addr.sin_port = htons(20039);
+    my_addr.sin_addr.s_addr = INADDR_ANY;
+    bzero(&(my_addr.sin_zero), 8);
+
+    if (bind(sock, (struct sockaddr *) &my_addr,
+            sizeof (struct sockaddr)) == -1) {
+        perror("Bind");
+        exit(1);
+    }
+
 	// printf("%s\n", "Lsa status:");
 	// for(i = 0 ; i < NUMBER_OF_ROUTERS; i++){
 	// 	printf("%d %d\n",i ,lsa_seq_num_det[i]);

@@ -15,7 +15,7 @@ extern int NUMBER_OF_ROUTERS;
 extern int NUMBER_OF_EDGES;
 extern int NUMBER_OF_NEIGHBORS;
 extern int* NEIGHBOR_IDS;
-extern int sock;
+// extern int sock;
 extern struct sockaddr_in my_addr;
 extern int MAX_POSSIBLE_DIST;
 extern int** neighbor_link_details;
@@ -29,6 +29,11 @@ extern int* every_node_neighbors;
 extern pthread_mutex_t lock;
 void* lsa_packet_sender(void* param){
 	int i, offset, peer_id;
+	int sock;
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+        perror("socket");
+        exit(1);
+    }
 	char send_data[1024];
 	struct hostent *host;
 	host = (struct hostent *) gethostbyname("localhost");

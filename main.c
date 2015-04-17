@@ -23,7 +23,7 @@ int** linkDetails;
 int** neighbor_link_details;
 int NUMBER_OF_NEIGHBORS;
 int* NEIGHBOR_IDS;
-int sock;
+// int sock;
 struct sockaddr_in my_addr;
 struct hostent *host;
 int MAX_POSSIBLE_DIST;
@@ -52,20 +52,20 @@ int main(int argc, char *argv[]){
 
 	host = (struct hostent *) gethostbyname("localhost");
 
-	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-		perror("socket");
-		exit(1);
-	}
+	// if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+	// 	perror("socket");
+	// 	exit(1);
+	// }
 
-	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = htons(20039);
-	my_addr.sin_addr.s_addr = INADDR_ANY;
-	bzero(&(my_addr.sin_zero), 8);
-	if (bind(sock, (struct sockaddr *) &my_addr,
-            sizeof (struct sockaddr)) == -1) {
-        perror("Bind");
-        exit(1);
-    }
+	// my_addr.sin_family = AF_INET;
+	// my_addr.sin_port = htons(20039);
+	// my_addr.sin_addr.s_addr = INADDR_ANY;
+	// bzero(&(my_addr.sin_zero), 8);
+	// if (bind(sock, (struct sockaddr *) &my_addr,
+ //            sizeof (struct sockaddr)) == -1) {
+ //        perror("Bind");
+ //        exit(1);
+ //    }
 	pthread_t hello_packet_sender;
 	// pthread_t lsa_packet_send;
     // pthread_t rec;
