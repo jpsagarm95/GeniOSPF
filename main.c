@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-	// host = (struct hostent *) gethostbyname("localhost");
+	host = (struct hostent *) gethostbyname("localhost");
 
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
 		perror("socket");
