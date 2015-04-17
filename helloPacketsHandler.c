@@ -19,6 +19,7 @@ extern int NUMBER_OF_NEIGHBORS;
 extern int* NEIGHBOR_IDS;
 extern int sock;
 extern struct sockaddr_in my_addr;
+extern struct hostent *host;
 extern int MAX_POSSIBLE_DIST;
 extern int** neighbor_link_details;
 extern int** actual_link_costs;
@@ -26,33 +27,27 @@ extern int** practise_costs;
 extern int*** every_node_lsa_details;
 extern int* every_node_neighbors;
 extern int* lsa_seq_num_det;
-int helloTime;
-
 
 extern pthread_mutex_t lock;
 
 const char* exchange(int i){
-	switch(i){
-		case 0: return "node-0";
-		case 1: return "node-1";
-		case 2: return "node-2";
-		case 3: return "node-3";
-		case 4: return "node-4";
-		case 5: return "node-5";
-		case 6: return "node-6";
-		case 7: return "node-7";
-		case 8: return "node-8";
-		case 9: return "node-9";
-	}
-}
+ 	switch(i){
+ 		case 0: return "node-0";
+ 		case 1: return "node-1";
+ 		case 2: return "node-2";
+ 		case 3: return "node-3";
+ 		case 4: return "node-4";
+ 		case 5: return "node-5";
+ 		case 6: return "node-6";
+ 		case 7: return "node-7";
+ 		case 8: return "node-8";
+ 		case 9: return "node-9";
+ 	}
+ }
 
 void* sender(void* param){
 	int i = 0, peer_id;
-	char addr[7] = "node-";
-	addr[6] = '\0';
-	struct hostent *host;
 	struct sockaddr_in peer_addr;
-    // printf("%s\n", "In sender");
     char send_data[1024];
 	while(1){
 		sleep(HELLO_INTERVAL);
@@ -60,34 +55,22 @@ void* sender(void* param){
 			peer_id = NEIGHBOR_IDS[i];
 			host = (struct hostent *) gethostbyname(exchange(peer_id));
 			printf("%s\n", exchange(peer_id));
-			// if(host == NULL){
-			// 	printf("%s\n", "Yes host is null.");
-			// }else{
-			// 	printf("%s\n", host);
-			// }
-			// peer_addr.sin_family = AF_INET;
-			// peer_addr.sin_port = htons(20039);
-			// peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
-			// bzero(&(peer_addr.sin_zero), 8);
 			peer_addr.sin_family = AF_INET;
-		    peer_addr.sin_port = htons(20039);
 		    peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
+		    peer_addr.sin_port = htons(20039);
+		    // printf("%s\n", "In sender");
 		    bzero(&(peer_addr.sin_zero), 8);
-			printf("Hello sent to %d\n", peer_id);
+			// printf("Hello sent to %d\n", peer_id);
 			strncpy(send_data, "HELLO", 5);
 			strncpy(send_data + 5, (char *)&identifier, 4);
 			// send_data[9] = '\0';
 			// printf("%s\n",pee);
-			printf("No of bytes sent %d\n", sendto(sock, send_data, 9, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr)));
-			struct timeval timenow;
-			gettimeofday(&timenow, NULL);
-			helloTime = ((timenow.tv_sec  % 1000000)* 1000000 + (timenow.tv_usec));
-			printf("%d\n", helloTime);
+			sendto(sock, send_data, 9, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr));
 		}
-		printf("%s\n", "Actual Link Costs:");
-		for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
-			printf("%d %d\n", actual_link_costs[i][0], actual_link_costs[i][1]);
-		}
+		// printf("%s\n", "Actual Link Costs:");
+		// for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
+		// 	printf("%d %d\n", actual_link_costs[i][0], actual_link_costs[i][1]);
+		// }
 	}
 }
 
@@ -97,7 +80,6 @@ void* receiver(void* param){
 	char recv_data[1024];
 	char send_data[1024];
 	int bytes_read;
-	struct hostent *host;
 	int peer_id, i, cost, max, min, dummy, node_seq_num, node_id, num_of_entries, offset, j;
 	// printf("%s\n", "Lsa status:");
 	// for(i = 0 ; i < NUMBER_OF_ROUTERS; i++){
@@ -106,10 +88,7 @@ void* receiver(void* param){
 	while(1){
 		bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &peer_addr, &addr_len);
 		recv_data[bytes_read] = '\0';
-		// bytes_read = recvfrom(sock, recv_data, 1024, 0, (struct sockaddr *) &client_addr, &addr_len);
-  //       recv_data[bytes_read] = '\0';
-
-		printf("%s\n", "I received something atleast.");
+		printf("%s\n", "I received something.");
 		// printf("\n(%s , %d) said : ", inet_ntoa(client_addr.sin_addr),
 		//         ntohs(client_addr.sin_port));
 		// printf("%s", recv_data);
@@ -120,24 +99,20 @@ void* receiver(void* param){
 			for(i = 0; i < NUMBER_OF_NEIGHBORS; i++){
 				if(actual_link_costs[i][0] == peer_id){
 					strncpy((char*)&dummy, recv_data + 18, 4);
-					struct timeval timenow;
-					gettimeofday(&timenow, NULL);
-					actual_link_costs[i][1] = ((timenow.tv_sec  % 1000000)* 1000000 + (timenow.tv_usec)) - helloTime;
+					actual_link_costs[i][1] = dummy;
 					// printf("%d\n",dummy );
 					break;
 				}
 			}
 			pthread_mutex_unlock(&lock);
 		}else if(strncmp(recv_data, "HELLO", 5) == 0){
-			printf("%s\n", "I just received a hello packet.");
 			strncpy((char *)&peer_id, recv_data + 5, 4);
-			// for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
-			// 	if(practise_costs[i][0] == peer_id){
-			// 		cost = practise_costs[i][1];
-			// 		break;
-			// 	}
-			// }
-			cost = 0;
+			for(i = 0 ; i < NUMBER_OF_NEIGHBORS; i++){
+				if(practise_costs[i][0] == peer_id){
+					cost = practise_costs[i][1];
+					break;
+				}
+			}
 			strncpy(send_data, "HELLOREPLY", 10);
 			strncpy(send_data + 10, (char *)&identifier, 4);
 			strncpy(send_data + 14, (char *)&peer_id, 4);

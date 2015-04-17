@@ -25,6 +25,7 @@ int NUMBER_OF_NEIGHBORS;
 int* NEIGHBOR_IDS;
 int sock;
 struct sockaddr_in my_addr;
+struct hostent *host;
 int MAX_POSSIBLE_DIST;
 int** actual_link_costs;
 int** practise_costs;
@@ -56,28 +57,15 @@ int main(int argc, char *argv[]){
 		exit(1);
 	}
 
-	// my_addr.sin_family = AF_INET;
-	// my_addr.sin_port = htons(20039);
-	// my_addr.sin_addr.s_addr = INADDR_ANY;
-	// bzero(&(my_addr.sin_zero), 8);
-	// if (bind(sock, (struct sockaddr *) &my_addr,
- //            sizeof (struct sockaddr)) == -1) {
- //        perror("Bind");
- //        exit(1);
- //    }
-
-
-    my_addr.sin_family = AF_INET;
-    my_addr.sin_port = htons(atoi(argv[1]));
-    my_addr.sin_addr.s_addr = INADDR_ANY;
-    bzero(&(my_addr.sin_zero), 8);
-
-    if (bind(sock, (struct sockaddr *) &my_addr,
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_port = htons(20039);
+	my_addr.sin_addr.s_addr = INADDR_ANY;
+	bzero(&(my_addr.sin_zero), 8);
+	if (bind(sock, (struct sockaddr *) &my_addr,
             sizeof (struct sockaddr)) == -1) {
         perror("Bind");
         exit(1);
     }
-
 	pthread_t hello_packet_sender;
 	// pthread_t lsa_packet_send;
     // pthread_t rec;
@@ -208,9 +196,12 @@ void initializer(int argc, char *argv[]){
 			counter++;
 		}
 
+		// if(MAX_POSSIBLE_DIST < linkDetails[i][3]){
+		// 	MAX_POSSIBLE_DIST = linkDetails[i][3];
+		// }
 	}
 
-	MAX_POSSIBLE_DIST = 9999999;
+	MAX_POSSIBLE_DIST = 999999;
 	// for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 	// 	printf("%d %d\n", practise_costs[i][0], practise_costs[i][1]);
 	// }
