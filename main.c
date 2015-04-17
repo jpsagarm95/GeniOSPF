@@ -68,11 +68,11 @@ int main(int argc, char *argv[]){
  //    }
 	pthread_t hello_packet_sender;
 	// pthread_t lsa_packet_send;
-    // pthread_t rec;
+    pthread_t rec;
     // pthread_t spf_t;
     pthread_create(&hello_packet_sender, NULL, &sender, NULL);
     // pthread_create(&lsa_packet_send, NULL, &lsa_packet_sender, NULL);
-    // pthread_create(&rec, NULL, &receiver, NULL);
+    pthread_create(&rec, NULL, &receiver, NULL);
     // pthread_create(&spf_t, NULL, &spf, NULL);
 
     while(1);
