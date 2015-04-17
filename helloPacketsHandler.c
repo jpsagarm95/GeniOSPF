@@ -59,25 +59,26 @@ void* sender(void* param){
 		for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 			peer_id = NEIGHBOR_IDS[i];
 			host = (struct hostent *) gethostbyname(exchange(peer_id));
-			if(host == NULL){
-				printf("%s\n", "Yes host is null.");
-			}else{
-				printf("%s\n", host);
-			}
+			printf("%s\n", exchange(peer_id));
+			// if(host == NULL){
+			// 	printf("%s\n", "Yes host is null.");
+			// }else{
+			// 	printf("%s\n", host);
+			// }
+			// peer_addr.sin_family = AF_INET;
+			// peer_addr.sin_port = htons(20039);
+			// peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
+			// bzero(&(peer_addr.sin_zero), 8);
 			peer_addr.sin_family = AF_INET;
-			peer_addr.sin_port = htons(20039);
-			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
-			bzero(&(peer_addr.sin_zero), 8);
-				// server_addr.sin_family = AF_INET;
-    // server_addr.sin_port = htons(atoi(argv[1]));
-    // server_addr.sin_addr = *((struct in_addr *) host->h_addr);
-    // bzero(&(server_addr.sin_zero), 8);
+		    peer_addr.sin_port = htons(20039);
+		    peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
+		    bzero(&(peer_addr.sin_zero), 8);
 			printf("Hello sent to %d\n", peer_id);
 			strncpy(send_data, "HELLO", 5);
 			strncpy(send_data + 5, (char *)&identifier, 4);
 			// send_data[9] = '\0';
 			// printf("%s\n",pee);
-			sendto(sock, send_data, 9, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr));
+			printf("No of bytes sent %d\n", sendto(sock, send_data, 9, 0, (struct sockaddr *) &peer_addr, sizeof (struct sockaddr)));
 			struct timeval timenow;
 			gettimeofday(&timenow, NULL);
 			helloTime = ((timenow.tv_sec  % 1000000)* 1000000 + (timenow.tv_usec));
