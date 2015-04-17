@@ -52,10 +52,7 @@ void* sender(void* param){
 	addr[6] = '\0';
 	struct hostent *host;
 	struct sockaddr_in peer_addr;
-	peer_addr.sin_family = AF_INET;
-	peer_addr.sin_port = htons(20039);
     // printf("%s\n", "In sender");
-    bzero(&(peer_addr.sin_zero), 8);
     char send_data[1024];
 	while(1){
 		sleep(HELLO_INTERVAL);
@@ -65,7 +62,10 @@ void* sender(void* param){
 			printf("%s\n", addr);
 			host = (struct hostent *) gethostbyname(addr);
 			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
-			// printf("Hello sent to %d\n", peer_id);
+			peer_addr.sin_port = htons(20039);
+			peer_addr.sin_family = AF_INET;
+			bzero(&(peer_addr.sin_zero), 8);
+			printf("Hello sent to %d\n", peer_id);
 			strncpy(send_data, "HELLO", 5);
 			strncpy(send_data + 5, (char *)&identifier, 4);
 			// send_data[9] = '\0';
