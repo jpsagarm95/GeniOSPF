@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 	}
 
 	my_addr.sin_family = AF_INET;
-	my_addr.sin_port = htons(20039 + identifier);
+	my_addr.sin_port = htons(20039);
 	my_addr.sin_addr.s_addr = INADDR_ANY;
 	bzero(&(my_addr.sin_zero), 8);
 	if (bind(sock, (struct sockaddr *) &my_addr,

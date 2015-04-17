@@ -31,24 +31,24 @@ int helloTime;
 
 extern pthread_mutex_t lock;
 
-char exchange(int i){
+const char* exchange(int i){
 	switch(i){
-		case 0: return '0';
-		case 1: return '1';
-		case 2: return '2';
-		case 3: return '3';
-		case 4: return '4';
-		case 5: return '5';
-		case 6: return '6';
-		case 7: return '7';
-		case 8: return '8';
-		case 9: return '9';
+		case 0: return "node-0";
+		case 1: return "node-1";
+		case 2: return "node-2";
+		case 3: return "node-3";
+		case 4: return "node-4";
+		case 5: return "node-5";
+		case 6: return "node-6";
+		case 7: return "node-7";
+		case 8: return "node-8";
+		case 9: return "node-9";
 	}
 }
 
 void* sender(void* param){
 	int i = 0, peer_id;
-	char addr[10] = "node-";
+	char addr[7] = "node-";
 	addr[6] = '\0';
 	struct hostent *host;
 	struct sockaddr_in peer_addr;
@@ -58,13 +58,20 @@ void* sender(void* param){
 		sleep(HELLO_INTERVAL);
 		for(i = 0 ; i < NUMBER_OF_NEIGHBORS ; i++){
 			peer_id = NEIGHBOR_IDS[i];
-			addr[5] = exchange(peer_id);
-			printf("%s\n", addr);
-			host = (struct hostent *) gethostbyname(addr);
-			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
-			peer_addr.sin_port = htons(20039 + peer_id);
+			host = (struct hostent *) gethostbyname(exchange(peer_id));
+			if(host == NULL){
+				printf("%s\n", "Yes host is null.");
+			}else{
+				printf("%s\n", host);
+			}
 			peer_addr.sin_family = AF_INET;
+			peer_addr.sin_port = htons(20039);
+			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
 			bzero(&(peer_addr.sin_zero), 8);
+				// server_addr.sin_family = AF_INET;
+    // server_addr.sin_port = htons(atoi(argv[1]));
+    // server_addr.sin_addr = *((struct in_addr *) host->h_addr);
+    // bzero(&(server_addr.sin_zero), 8);
 			printf("Hello sent to %d\n", peer_id);
 			strncpy(send_data, "HELLO", 5);
 			strncpy(send_data + 5, (char *)&identifier, 4);
