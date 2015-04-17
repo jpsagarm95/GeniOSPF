@@ -62,7 +62,7 @@ void* sender(void* param){
 			printf("%s\n", addr);
 			host = (struct hostent *) gethostbyname(addr);
 			peer_addr.sin_addr = *((struct in_addr *) host->h_addr);
-			peer_addr.sin_port = htons(20039);
+			peer_addr.sin_port = htons(20039 + peer_id);
 			peer_addr.sin_family = AF_INET;
 			bzero(&(peer_addr.sin_zero), 8);
 			printf("Hello sent to %d\n", peer_id);
